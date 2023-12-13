@@ -5,12 +5,15 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mehdimirzaie <mehdimirzaie@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/27 14:19:52 by mmirzaie          #+#    #+#             */
-/*   Updated: 2023/12/13 10:00:29 by mehdimirzai      ###   ########.fr       */
+/*   Created: 2023/11/25 19:40:29 by clovell           #+#    #+#             */
+/*   Updated: 2023/12/14 10:21:49 by mehdimirzai      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minirt.h"
+#include <mlx.h>
+#include <stdio.h>
+#include "game.h"
+#include "utils_mlx.h"
 
 void	put_color_to_pixel(t_mlx *mlx, int x, int y, int color)
 {
@@ -26,10 +29,10 @@ void	render(t_mlx *mlx)
 	int		y;
 
 	y = -1;
-	while (++y < SIZE)
+	while (++y < SHEIGHT)
 	{
 		x = -1;
-		while (++x < SIZE)
+		while (++x < SWIDTH)
 		{
 			put_color_to_pixel(mlx, x, y, 0xff0000);
 		}

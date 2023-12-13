@@ -1,0 +1,8 @@
+3dgame
+**/*.swp
+**/*.swo
+**/*.so
+**/*.o
+**/*.a
+**/obj/
+.DS_Store

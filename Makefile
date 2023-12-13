@@ -1,105 +1,119 @@
-NAME		:=	game
+SRCSF = main.c	\
+		utils_mlx/init.c	\
 
-LIBS		:=	ft
-LIBFT_TARGET:=	lib/libft/libft.a
 
-# Add the path to the MLX library here
-MLX_LIB_DIR	:=	lib/libmlx
+# INCSF = cubed.h
 
-INCS		= 	include    \
-				lib/libft/include    \
-				lib/libmlx/include
+ifndef $(OS)
+OS := $(shell uname)
+endif
 
-SRC_DIR		:=	src
+$(info Compiling for OS:$(OS))
 
-SRCS        :=	main.c	\
-                utils/init.c	\
-				# utils/init_vec.c	\
-				utils/utils.c	\
+NAME = 3dgame
 
-SRCS        := $(SRCS:%=$(SRC_DIR)/%)
+DIRSRC = src
+DIROBJ = obj
+DIRINC = inc
+DIRLIB = lib
 
-BUILD_DIR   := .build
-OBJS        := $(SRCS:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
-DEPS        := $(OBJS:.o=.d)
+LIBFT = libft/libft.a
 
-CC          := cc
-CFLAGS      := -Wall -Wextra -Werror -g $(DFLAGS)
-CPPFLAGS    := $(addprefix -I,$(INCS)) -MMD -MP
-LDFLAGS     := $(addprefix -L,$(dir $(LIBFT_TARGET))) -L$(MLX_LIB_DIR)  # Add MLX library directory
-LDLIBS      := $(addprefix -l,$(LIBS)) -lmlx  # Link against MLX library
-MLXFLAGS    := -L$(MLX_LIB_DIR) -lmlx -framework OpenGL -framework AppKit  # MLX-specific flags
-RLFLAGS     := -lreadline
+ifeq ($(OS),Linux)
+LIBMLX = mlx-linux/libmlx.a
+else
+LIBMLX = mlx/libmlx.a
+endif
 
-RM          := rm -f
-MAKEFLAGS   += --silent --no-print-directory
-DIR_DUP     = mkdir -p $(@D)
+LIBSF = $(LIBFT) $(LIBMLX)
 
+# All relative to Makefile's folder
+SRCS = $(patsubst %.c,$(DIRSRC)/%.c, $(SRCSF))
+OBJS = $(SRCS:$(DIRSRC)/%.c=$(DIROBJ)/%.o)
+LIBS = $(patsubst %.a,$(DIRLIB)/%.a, $(LIBSF)) 
+INCS = $(patsubst %.h,$(DIRINC)/%.h, $(INCSF))
+DEPS = $(OBJS:.o=.d)
+
+LIB-I = $(patsubst %,-I%,$(dir $(LIBS))) -I$(DIRLIB)
+LIB-l = $(subst lib,-l,$(basename $(notdir $(LIBSF))))
+LIB-L = $(patsubst %,-L$(DIRLIB)/%, $(dir $(LIBSF)))
+
+CC = cc
+
+WFLAGS =#-Wall -Werror -Wextra
+CPPFLAGS =-I$(DIRINC) $(LIB-I)  -MMD -MP
+CFLAGS = $(OPFLAG) $(DFLAGS) $(XCFLAGS) $(WFLAGS)
+LDFLAGS = $(OPFLAG) $(DFLAGS) $(XLDFLAGS) $(LIB-L) $(LIB-l) -lz -lm 
+PGFLAGS = #-pg
+OPFLAG = -O3
+
+ifneq ($(OS),Linux) 
+LDFLAGS += -framework OpenGL -framework AppKit 
+else 
+LDFLAGS += -lX11 -lXext
+endif
+
+# RULES
 all: $(NAME)
 
-$(NAME): $(LIBFT_TARGET) $(OBJS)
-	make all -C lib/libmlx
-	$(CC) $(LDFLAGS) $(MLXFLAGS) $(OBJS) $(LDLIBS) -o $(NAME) $(DFLAGS)
-	$(call print_linking, $(NAME))
+# OBJ TO PROJECT
+$(NAME): $(LIBS) $(OBJS)
+	-@printf "${BLUE}"
+	$(CC) $(PGFLAGS) $(OBJS) $(LDFLAGS) -o $@
+	-@printf "${NC}"
 
-$(LIBFT_TARGET):
-	$(MAKE) -C $(@D)
+# SOURCE TO OBJ
+$(OBJS): $(DIROBJ)%.o : $(DIRSRC)%.c $(INCS) | $(DIROBJ)
+	-@mkdir -p $(dir $@)
+	-@printf "${GREEN}"
+	-$(CC) $(PGFLAGS) $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
+	-@printf "${NC}"
 
-$(OBJS): $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
-	$(DIR_DUP)
-	@$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
-	@$(call print_obj,$@)
-
-# cleans only the project.
-clean:
-	$(RM) $(OBJS) $(DEPS)
-	$(call print_clean,$(addsuffix \n,$(OBJS)))
-
-#  lib clean, clean all library objects.
-lclean:
-	for f in $(dir $(LIBFT_TARGET)); do echo "${GREEN}Cleaning: ${CYAN} $$f ${NC} $$"; $(MAKE) -C $$f clean; done
-
-# full clean, clean all objects and libraries and binaries
+# CLEANING
 fclean: clean
-	for f in $(dir $(LIBFT_TARGET)); do $(MAKE) -C $$f fclean; done
-	make clean -C lib/libmlx
-	$(RM) $(NAME)
-	$(call print_fclean,$(NAME))
+	-@printf "${BRED}Cleaning executable!\n${RED}"
+	-rm -f $(NAME)
+	-@printf "${NC}"
+
+clean:
+	-@printf "${BYELLOW}Cleaning objects!\n${RED}"
+	-rm -rf $(DIROBJ)
+	-@printf "${NC}"
 
 re: fclean all
 
-info-%:
-	$(MAKE) --dry-run --always-make $* | grep -v "info"
+# Dependencies
 -include $(DEPS)
 
-define print_linking
-	echo "${GREEN}Linking:${BLUE} $(or $1, $$1) ${NC}"
-endef
-define print_fclean
-	echo "${BLUE}cleaned:${CYAN} $(or $1, $$1) ${NC}"
-endef
-define print_clean
-	echo "${BLUE}cleaned:\n${YELLOW} $(or $1, $$1) ${NC}"
-endef
-define print_target
-	echo "${GREEN}Compiling:${BLUE} $(or $1, $$1) ${NC}"
-endef
-define print_obj
-	echo "${BLUE}created: ${YELLOW} $(or $1, $$1)${NC}"
-endef
-.PHONY: re fclean clean lclean all $(LIBFT_TARGET)
-.SILENT:
+$(DIRLIB)/$(LIBFT):
+	make -s -C $(dir $@) all bonus
 
-export DFLAGS
-export print_linking
-export print_fclean
-export print_clean
-export print_target
-export print_obj
+$(DIRLIB)/$(LIBGNL):
+	make -s -C $(dir $@) all
+
+$(DIRLIB)/$(LIBMLX):
+	make -s -C $(dir $@)
+
+$(DIRLIB)/$(LIBMLX_SO): $(LIBMLX)
+	cp $(DIRMLX)/libmlx.so ./libmlx.so
+
+# Folders
+$(DIROBJ):
+	-@printf "${CYAN}"
+	-mkdir -p $(DIROBJ)
+	-@printf "${NC}"
+
+.PHONY: all re fclean clean libclean
 
 # COLORS
-export GREEN = \033[1;32m
+export BGREEN = \033[1;32m
+export GREEN = \033[0;32m
+export BRED = \033[1;31m
+export RED = \033[0;31m
+export BYELLOW = \033[1;33m
 export YELLOW = \033[0;33m
-export BLUE = \033[1;34m
-export CYAN = \033[1;36m
+export BBLUE = \033[1;34m
+export BLUE = \033[0;34m
+export BCYAN = \033[1;36m
+export CYAN = \033[0;36m
 export NC = \033[0m
