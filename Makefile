@@ -1,5 +1,6 @@
 SRCSF = main.c	\
 		utils_mlx/init.c	\
+		utils/exits.c	\
 
 
 # INCSF = cubed.h
@@ -45,7 +46,7 @@ CPPFLAGS =-I$(DIRINC) $(LIB-I)  -MMD -MP
 CFLAGS = $(OPFLAG) $(DFLAGS) $(XCFLAGS) $(WFLAGS)
 LDFLAGS = $(OPFLAG) $(DFLAGS) $(XLDFLAGS) $(LIB-L) $(LIB-l) -lz -lm 
 PGFLAGS = #-pg
-OPFLAG = -O3
+OPFLAG = -g
 
 ifneq ($(OS),Linux) 
 LDFLAGS += -framework OpenGL -framework AppKit 

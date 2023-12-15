@@ -6,7 +6,7 @@
 /*   By: mehdimirzaie <mehdimirzaie@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/25 19:40:29 by clovell           #+#    #+#             */
-/*   Updated: 2023/12/14 10:21:49 by mehdimirzai      ###   ########.fr       */
+/*   Updated: 2023/12/15 14:03:31 by mehdimirzai      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,14 +40,45 @@ void	render(t_mlx *mlx)
 	mlx_put_image_to_window(mlx->mlx, mlx->window, mlx->image, 0, 0);
 }
 
+int nMapWidth = 16;				// World Dimensions
+int nMapHeight = 16;
 
 int	main(int ac, char **av)
 {
-	t_mlx	*mlx = malloc(sizeof(t_mlx));
-	(void)av;
-	(void)ac;
-	init_mlx(mlx);
-	mlx_loop_hook(mlx->mlx, (void *)render, mlx);
-	mlx_loop(mlx->mlx);
+	// if (ac != 2)
+	// 	error("too few arguments\n");
+	(void)ac, (void)av;
+	int map[16][16] = {
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+	};
+
+	for (int x = 0; x < 16; x++)
+	{
+		for (int y = 0; y < 16; y++)
+		{
+			printf("%d ", map[x][y]);
+		}
+		printf("\n");
+	}
+
+	// t_mlx	*mlx = malloc(sizeof(t_mlx));
+	// init_mlx(mlx);
+	// mlx_loop_hook(mlx->mlx, (void *)render, mlx);
+	// mlx_loop(mlx->mlx);
 	return (0);
 }

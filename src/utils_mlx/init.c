@@ -1,5 +1,5 @@
 
-# include "game.h"
+#include "game.h"
 #include <mlx.h>
 
 void	init_mlx(t_mlx *mlx)
