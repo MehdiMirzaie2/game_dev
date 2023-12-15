@@ -10,6 +10,7 @@
 # include <stdlib.h>
 # include <stddef.h>
 # include <errno.h>
+#include "render.h"
 
 # define SWIDTH  960
 # define SHEIGHT 960
