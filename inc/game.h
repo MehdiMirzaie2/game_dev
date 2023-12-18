@@ -12,11 +12,14 @@
 # include <stddef.h>
 # include <errno.h>
 #include "render.h"
+# include "stdbool.h"
 
 # include "utils.h"
 
-# define SWIDTH  960
-# define SHEIGHT 960
+#define mapWidth 24
+#define mapHeight 24
+#define screenWidth 640
+#define screenHeight 480
 
 typedef struct s_mlx				t_mlx;
 
